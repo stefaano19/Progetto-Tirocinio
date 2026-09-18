@@ -789,12 +789,62 @@ QLabel#chat_avatar_assistant {
     font-size: 14px;
 }
 
+/* ── Code Block (IDE-style) ──────────────────────────────────────────── */
+
+QFrame#code_block_container {
+    background-color: #1e1e1e;
+    border: 1px solid #333333;
+    border-radius: 8px;
+}
+
+QFrame#code_block_header {
+    background-color: #262626;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid #333333;
+}
+
+QLabel#code_block_lang {
+    color: #9aa0a6;
+    font-family: "Fira Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+}
+
+QPushButton#code_block_copy_btn {
+    background: transparent;
+    border: none;
+    color: #9aa0a6;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+QPushButton#code_block_copy_btn:hover {
+    background-color: #333333;
+    color: #f8f9fa;
+}
+
+QTextBrowser#code_block_content {
+    background-color: #1e1e1e;
+    border: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    color: #d4d4d4;
+    padding: 6px 4px;
+}
+
 /* ── Chat Input ──────────────────────────────────────────────────────── */
 
 QFrame#chat_input_frame {
     background-color: #1a1a1a;
     border: 1px solid #333333;
-    border-radius: 12px;
+    border-radius: 16px;
+}
+
+QFrame#chat_input_frame[focused="true"] {
+    border: 1px solid #007acc;
 }
 
 QTextEdit#chat_input_text {
@@ -811,6 +861,24 @@ QPushButton#chat_attach_button {
 
 QPushButton#chat_attach_button:hover {
     background-color: #2a2a2a;
+}
+
+QPushButton#chat_send_button {
+    background-color: #007acc;
+    color: #ffffff;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+QPushButton#chat_send_button:hover {
+    background-color: #0098ff;
+}
+
+QPushButton#chat_send_button:disabled {
+    background-color: #2a2a2a;
+    color: #5c636a;
 }
 
 /* ── Tool Stage Widget ───────────────────────────────────────────────── */

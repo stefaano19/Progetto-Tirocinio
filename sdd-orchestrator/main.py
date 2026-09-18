@@ -336,6 +336,10 @@ def _wire_chat(
         if not active_bubble[0]:
             active_bubble[0] = view.add_message("assistant", "")
         active_bubble[0].update_content(text)
+        # update_content() bypasses add_message(), which is what normally
+        # keeps the view pinned to the bottom — without this, the visible
+        # area stays put while the bubble grows and the tail looks clipped.
+        view.scroll_to_bottom()
         
     def on_tool_executed(name, detail):
         active_bubble[0] = None  # Reset so the next text gets a new bubble

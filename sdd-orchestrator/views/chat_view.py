@@ -61,7 +61,7 @@ class ChatView(QWidget):
         
         # Contenitore centrale (max width 800)
         chat_center = QWidget()
-        chat_center.setMaximumWidth(850)
+        chat_center.setMaximumWidth(800)
         chat_center.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         chat_layout = QVBoxLayout(chat_center)
         chat_layout.setContentsMargins(0, 0, 0, 0)
@@ -118,7 +118,7 @@ class ChatView(QWidget):
         self.empty_label.hide()
         bubble = ChatBubble(role, content)
         self.messages_layout.addWidget(bubble)
-        self._scroll_to_bottom()
+        self.scroll_to_bottom()
         return bubble
         
     def add_tool_stage(self, name: str, detail: str) -> ToolStageWidget:
@@ -140,7 +140,7 @@ class ChatView(QWidget):
         wrap_widget = QWidget()
         wrap_widget.setLayout(wrap)
         self.messages_layout.addWidget(wrap_widget)
-        self._scroll_to_bottom()
+        self.scroll_to_bottom()
         return stage
         
     def clear_messages(self) -> None:
@@ -163,8 +163,13 @@ class ChatView(QWidget):
         """Updates the conversation history in the sidebar."""
         self.sidebar.populate(conversations)
 
-    def _scroll_to_bottom(self) -> None:
-        """Automatically scrolls to the latest message."""
+    def scroll_to_bottom(self) -> None:
+        """Automatically scrolls to the latest message.
+
+        Public so callers driving a bubble's content directly (e.g. token
+        streaming, which bypasses add_message()) can keep the view pinned
+        to the bottom as the message grows.
+        """
         self.scroll_area.verticalScrollBar().setValue(
             self.scroll_area.verticalScrollBar().maximum()
         )
