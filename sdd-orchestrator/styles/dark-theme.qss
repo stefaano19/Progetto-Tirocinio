@@ -693,6 +693,28 @@ QLabel#h1 {
     color: #f8f9fa;
 }
 
+/* ── Settings View ───────────────────────────────────────────────────── */
+
+QFrame#settings_card {
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+}
+
+QLabel#settings_card_icon {
+    font-size: 18px;
+}
+
+QLabel#settings_status_label {
+    color: #adb5bd;
+    font-size: 12px;
+}
+
+QComboBox#settings_combo {
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
 /* ── CLI Status View (cards) ─────────────────────────────────────────── */
 
 QLabel#cli_card_name {

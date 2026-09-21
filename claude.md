@@ -1483,13 +1483,14 @@ Collega tutti i componenti dell'Iterazione 1 in `main.py` per il flusso end-to-e
 
 | Sub-step | Stato | File | Descrizione |
 |----------|-------|------|-------------|
-| 4.1.1 Codebase Model | ⬜ | `models/codebase_model.py` | `analyze_structure()`, `detect_languages()`, `generate_report()` |
-| 4.1.2 Codebase Worker | ⬜ | `workers/codebase_worker.py` | `QThread` per analisi in background con progress |
-| 4.1.3 Codebase View | ⬜ | `views/codebase_view.py` | `QSplitter` con file tree (`QTreeView`) + report panel (stats cards + `QTextBrowser` markdown) |
-| 4.1.4 Codebase Controller | ⬜ | `controllers/codebase_controller.py` | Mediatore con signal `analysis_started/complete/error` |
-| 4.1.5 Wiring codebase | ⬜ | `main.py` | `replace_view("codebase", codebase_view)`, quick action "Analyze Codebase" |
+| 4.1.1 Codebase Model | ✅ | `models/codebase_model.py` | `analyze_structure()`, `detect_languages()`, `generate_report()`/`format_report()`. Esclude `node_modules`/`.venv`/`dist`/etc., mappa estensione→linguaggio, top 10 file più grandi |
+| 4.1.2 Codebase Worker | ✅ | `workers/codebase_worker.py` | `CodebaseWorker(BaseWorker)` — esegue `analyze_structure()` + `format_report()` in background, un solo attraversamento dell'albero |
+| 4.1.3 Codebase View | ✅ | `views/codebase_view.py` | `QSplitter` con file tree (`QFileSystemModel` + `QTreeView`) + report panel (stat cards Files/Directories/Lines + `QTextBrowser` markdown renderizzato) |
+| 4.1.4 Codebase Controller | ✅ | `controllers/codebase_controller.py` | Mediatore con signal `analysis_started/complete/error`, previene scan paralleli |
+| 4.1.5 Wiring codebase | ✅ | `main.py` | `replace_view("codebase", codebase_view)`, quick action "Analyze Codebase" dalla Welcome Screen (righe 141–149, 228–233) |
 
 **Dipendenze:** Step 1.1 (workspace path)
+**Risultato:** Iterazione 4 completa e verificata (codice già presente, non ancora riflesso in questa tabella prima di questo aggiornamento).
 
 ---
 
@@ -1597,7 +1598,7 @@ Collega tutti i componenti dell'Iterazione 1 in `main.py` per il flusso end-to-e
 | 3 Chat LLM | 3.1 Chat Model | ✅ | Dataclass + persistenza |
 | 3 Chat LLM | 3.2 Chat Widgets | ✅ | Bubble, input, sidebar |
 | 3 Chat LLM | 3.3 Chat View | ✅ | View/Controller/Wiring + Worker con invocazione CLI reale via subprocess |
-| 4 Codebase | 4.1 Analysis | ⬜ | Model + view + worker |
+| 4 Codebase | 4.1 Analysis | ✅ | Model + view + worker |
 | 5 Grafo | 5.1 Graph | ⬜ | Sigma.js + QWebEngine |
 | 6 OpenSpec Core | 6.1 Model | ⬜ | Model + worker |
 | 6 OpenSpec Core | 6.2 Editor + Stepper | ⬜ | UI workflow 5 fasi |
