@@ -99,3 +99,14 @@ class WikiController(QObject):
 
         # Start background task
         worker.start()
+
+    def shutdown(self) -> None:
+        """Waits for any in-flight import worker before the app closes.
+
+        Prevents Qt from aborting the process if the window closes while
+        an ``ImportWorker`` is still copying files. Called from
+        ``app.aboutToQuit`` in ``main.py``.
+        """
+        for worker in list(self._workers):
+            if worker.isRunning():
+                worker.wait()

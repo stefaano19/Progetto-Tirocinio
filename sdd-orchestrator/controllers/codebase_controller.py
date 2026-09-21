@@ -69,3 +69,13 @@ class CodebaseController(QObject):
         if self._worker is not None:
             self._worker.deleteLater()
             self._worker = None
+
+    def shutdown(self) -> None:
+        """Waits for an in-flight analysis before the app closes.
+
+        Prevents Qt from aborting the process if the window closes while
+        ``CodebaseWorker`` is still walking a large tree. Called from
+        ``app.aboutToQuit`` in ``main.py``.
+        """
+        if self._worker is not None and self._worker.isRunning():
+            self._worker.wait()

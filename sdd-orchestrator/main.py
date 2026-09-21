@@ -259,6 +259,20 @@ def main() -> None:
         # Switch to the wiki view by simulating a click on the wiki nav button
         window.icon_sidebar.nav_clicked.emit("wiki")
 
+    # ── Graceful worker shutdown ─────────────────────────────────────
+    # Closing the window while a background QThread is still running
+    # (most commonly the CLI scan, which can take several seconds) would
+    # let Qt destroy a still-running QThread and abort the process
+    # ("QThread: Destroyed while thread is still running"). Each
+    # controller cancels/waits for its own worker(s) before the app quits.
+    def _shutdown_workers() -> None:
+        cli_controller.shutdown()
+        wiki_controller.shutdown()
+        chat_controller.shutdown()
+        codebase_controller.shutdown()
+
+    app.aboutToQuit.connect(_shutdown_workers)
+
     # ── Show the window ──────────────────────────────────────────
     window.show()
 

@@ -134,6 +134,19 @@ class CLIController(QObject):
         self._last_results = results
         self.cli_scan_complete.emit(results)
 
+    def shutdown(self) -> None:
+        """Cancels and waits for an in-flight scan before the app closes.
+
+        Without this, closing the window while the (up to ~10s) login
+        shell probe is still running lets Qt destroy the still-running
+        ``QThread`` and abort the process ("QThread: Destroyed while
+        thread is still running"). Called from ``app.aboutToQuit`` in
+        ``main.py``.
+        """
+        if self._worker is not None and self._worker.isRunning():
+            self._worker.cancel()
+            self._worker.wait()
+
     def _on_worker_finished(self) -> None:
         """Cleanup of the worker thread after completion.
 

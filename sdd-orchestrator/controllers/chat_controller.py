@@ -213,3 +213,16 @@ class ChatController(QObject):
         if self._current_chat_id:
             self._model.save_conversation(self._current_chat_id, self._current_title, self._current_messages)
             self._refresh_history()
+
+    def shutdown(self) -> None:
+        """Cancels and waits for any in-flight CLI subprocess before the app closes.
+
+        A chat response (or the background title-generation call) can run
+        for an arbitrarily long time, so closing the window would let Qt
+        destroy a still-running ``QThread`` and abort the process. Called
+        from ``app.aboutToQuit`` in ``main.py``.
+        """
+        for worker in (self._worker, self._title_worker):
+            if worker is not None and worker.isRunning():
+                worker.cancel()
+                worker.wait()

@@ -70,6 +70,16 @@ class CLIScanWorker(BaseWorker):
     def __init__(self, model: CLIDiscoveryModel) -> None:
         super().__init__()
         self._model = model
+        self._cancelled = False
+
+    def cancel(self) -> None:
+        """Requests the scan loop to stop after the CLI currently being checked.
+
+        Used on app shutdown so ``wait()`` doesn't have to block for the
+        full remaining scan (up to ~3s per CLI) — see
+        ``CLIController.shutdown()``.
+        """
+        self._cancelled = True
 
     def do_work(self) -> None:
         """Scans all CLIs in the registry sequentially.
@@ -91,6 +101,9 @@ class CLIScanWorker(BaseWorker):
         results: list[CLIInfo] = []
 
         for i, cli_def in enumerate(registry):
+            if self._cancelled:
+                return
+
             # Scans the single CLI (includes PATH probe + version check)
             info = self._model.scan_single(cli_def["key"])
 
