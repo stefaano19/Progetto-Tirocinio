@@ -770,11 +770,14 @@ QTextBrowser#chat_bubble_text {
     background: transparent;
     color: #f8f9fa;
     font-size: 14px;
+    border: none;
+    padding: 0px;
 }
 
 QFrame#chat_bubble[bubble_role="user"] {
-    background-color: #2a2a2a; /* Più neutro rispetto al blu scuro */
-    border-radius: 12px;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
 }
 
 QFrame#chat_bubble[bubble_role="assistant"] {
@@ -851,6 +854,8 @@ QTextEdit#chat_input_text {
     background: transparent;
     color: #f8f9fa;
     font-size: 14px;
+    border: none;
+    padding: 0px;
 }
 
 QPushButton#chat_attach_button {

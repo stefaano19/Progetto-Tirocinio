@@ -87,6 +87,18 @@ class ChatView(QWidget):
         
         self.scroll_area.setWidget(self.messages_container)
         chat_layout.addWidget(self.scroll_area, stretch=1)
+
+        # Auto-follow the bottom as content grows (e.g. a streaming
+        # response). Calling scroll_to_bottom() right after resizing a
+        # bubble reads the scrollbar's maximum before Qt's layout pass has
+        # recomputed it, so it scrolls to a stale (too-small) value and the
+        # newest lines end up rendered below the viewport — visually
+        # "hidden" under the composer bar. rangeChanged only fires once the
+        # range is actually up to date, so following it here always lands
+        # on the true bottom.
+        self.scroll_area.verticalScrollBar().rangeChanged.connect(
+            lambda _min, max_val: self.scroll_area.verticalScrollBar().setValue(max_val)
+        )
         
         # Input area ancorata in basso
         self.chat_input = ChatInput()

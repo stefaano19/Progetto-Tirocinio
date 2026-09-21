@@ -30,26 +30,24 @@ class ChatTextEdit(QTextEdit):
         self.setFrameShape(QFrame.Shape.NoFrame)
         self.viewport().setAutoFillBackground(False)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.textChanged.connect(self._adjust_height)
 
+        # No max height / no internal scrollbar: the box always grows to
+        # show the whole message, however long it is.
         self._min_height = 40
-        self._max_height = 150
         self.setMinimumHeight(self._min_height)
-        self.setMaximumHeight(self._max_height)
+        # textChanged only fires on an actual edit, so an empty box at
+        # construction time would otherwise never get an explicit height.
+        self._adjust_height()
 
     def _adjust_height(self):
         doc_height = int(self.document().size().height())
         margins = self.contentsMargins()
         # Calcolo dell'altezza necessaria
         target_height = doc_height + margins.top() + margins.bottom() + 10
-
-        if target_height > self._max_height:
-            self.setFixedHeight(self._max_height)
-            self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        else:
-            self.setFixedHeight(max(self._min_height, target_height))
-            self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setFixedHeight(max(self._min_height, target_height))
 
     def keyPressEvent(self, event):
         # Enter invia, Shift+Enter a capo

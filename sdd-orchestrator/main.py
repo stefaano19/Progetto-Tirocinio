@@ -23,6 +23,7 @@ Rules followed:
   - §12:   Font SF Pro 14px, size 1280×800
 """
 
+import signal
 import sys
 from pathlib import Path
 
@@ -50,6 +51,13 @@ def apply_theme(app: QApplication) -> None:
 
 
 def main() -> None:
+    # Let Ctrl+C terminate the process immediately via the default OS
+    # handler instead of Python's default SIGINT behavior, which raises
+    # KeyboardInterrupt asynchronously — including, occasionally, in the
+    # middle of a Qt->Python metacall (e.g. a running QPropertyAnimation),
+    # producing a noisy but harmless traceback right as the app exits.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     app = QApplication(sys.argv)
     app.setApplicationName("SDD Orchestrator")
     app.setOrganizationName("SDD")

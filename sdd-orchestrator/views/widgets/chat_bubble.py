@@ -6,7 +6,7 @@ Displays a single chat message (user or assistant) with markdown and rich code b
 import re
 
 import markdown
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
@@ -80,7 +80,13 @@ class _AutoHeightTextBrowser(QTextBrowser):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        # Fixed (not Minimum) vertically: Minimum lets the layout stretch
+        # the widget to soak up leftover space in the scroll area, which
+        # ballooned single-line bubbles to fill the whole viewport. Fixed
+        # makes the layout respect sizeHint() exactly, and it still tracks
+        # content because sizeHint() itself is driven by the document and
+        # updateGeometry() is called whenever that document changes.
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.document().documentLayout().documentSizeChanged.connect(
             lambda *_: self.updateGeometry()
         )
@@ -92,10 +98,21 @@ class _AutoHeightTextBrowser(QTextBrowser):
         self.updateGeometry()
 
     def sizeHint(self):
-        return self.document().size().toSize()
+        size = self.document().size().toSize()
+        # Small cushion so descenders on the last line never brush the edge.
+        return QSize(size.width(), size.height() + 6)
 
     def minimumSizeHint(self):
         return self.sizeHint()
+
+    def wheelEvent(self, event) -> None:
+        # These boxes always size themselves to their full content, so
+        # there is never anything of their own to scroll. Ignoring the
+        # event (instead of letting QAbstractScrollArea consume it) makes
+        # Qt propagate the wheel/trackpad gesture up to the messages
+        # QScrollArea, so scrolling over a bubble scrolls the chat, not
+        # the bubble.
+        event.ignore()
 
 
 class CodeBlockWidget(QFrame):
@@ -165,6 +182,12 @@ class ChatBubble(QWidget):
         super().__init__(parent)
         self.role = role
 
+        # Fixed vertically: without this, messages_layout (no trailing
+        # stretch) redistributes any leftover scroll-area space across
+        # Preferred-policy bubbles — every new message visibly resizes all
+        # the earlier ones instead of just stacking below them.
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(16, 8, 16, 8)
 
@@ -178,7 +201,12 @@ class ChatBubble(QWidget):
         main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         if role == "user":
-            self.content_layout.setContentsMargins(16, 12, 16, 12)
+            # Boxed: right-aligned bubble with a muted background (see
+            # QFrame#chat_bubble[bubble_role="user"] in the QSS). Generous
+            # margins keep the text away from the rounded border on every
+            # side — too little top margin is what let the border clip
+            # into the first line's ascenders before.
+            self.content_layout.setContentsMargins(14, 12, 14, 12)
             main_layout.addStretch()
             main_layout.addWidget(self.bubble)
             self.bubble.setMaximumWidth(650)
